@@ -273,26 +273,27 @@ if page == '🏠 首页':
 # ------------------------------
 elif page == '📥 提交新项目':
     st.header('📥 提交新项目配置')
-    st.caption('✅ 可直接下拉选择，也可直接打字输入新内容')
+    st.caption('✅ 下拉选择 + 自由输入，三列超紧凑')
 
     with st.form('new_form'):
-        col1, col2 = st.columns(2)
+        c1, c2, c3 = st.columns(3)
 
-        def combo_input(label, options):
-            return col1.text_input(label, placeholder="输入新内容 或 从下拉选择") if col1.checkbox(label+" → 手动输入", value=False) else col2.selectbox(label, options)
+        def field(col, label, opts):
+            with col:
+                sel = st.selectbox(label, opts)
+                val = st.text_input("→ 手写输入", value=sel).strip()
+            return val
 
-        with col1:
-            售卖区域 = combo_input("售卖区域", area_opts)
-            产品型号版本 = combo_input("产品型号版本", model_opts)
-            变流单元类型 = combo_input("变流单元类型", converter_opts)
+        售卖区域 = field(c1, "售卖区域", area_opts)
+        产品型号版本 = field(c2, "产品型号版本", model_opts)
+        变流单元类型 = field(c3, "变流单元类型", converter_opts)
 
-        with col2:
-            变压器规格 = combo_input("变压器规格", trans_opts)
-            环网柜规格 = combo_input("环网柜规格", cab_opts)
-            SCC规格 = combo_input("SCC规格", scc_opts)
+        变压器规格 = field(c1, "变压器规格", trans_opts)
+        环网柜规格 = field(c2, "环网柜规格", cab_opts)
+        SCC规格 = field(c3, "SCC规格", scc_opts)
 
         st.divider()
-        项目名称 = st.text_input('项目名称（必填）', placeholder="请输入项目名称").strip()
+        项目名称 = st.text_input('项目名称（必填）').strip()
 
         submitted = st.form_submit_button('✅ 提交新项目', use_container_width=True)
         if submitted:
@@ -300,18 +301,18 @@ elif page == '📥 提交新项目':
                 st.error('项目名称不能为空')
             else:
                 data = {
-                    '售卖区域': str(售卖区域).strip(),
-                    '产品型号版本': str(产品型号版本).strip(),
-                    '变流单元类型': str(变流单元类型).strip(),
-                    '变压器规格': str(变压器规格).strip(),
-                    '环网柜规格': str(环网柜规格).strip(),
-                    'SCC规格': str(SCC规格).strip(),
-                    '项目名称': 项目名称,
-                    '手册料号': '',
-                    '网址链接': '',
-                    '创建时间': datetime.now().strftime('%Y-%m-%d %H:%M'),
-                    '处理状态': '待审核',
-                    '处理人': st.session_state.user
+                    '售卖区域':售卖区域,
+                    '产品型号版本':产品型号版本,
+                    '变流单元类型':变流单元类型,
+                    '变压器规格':变压器规格,
+                    '环网柜规格':环网柜规格,
+                    'SCC规格':SCC规格,
+                    '项目名称':项目名称,
+                    '手册料号':'',
+                    '网址链接':'',
+                    '创建时间':datetime.now().strftime('%Y-%m-%d %H:%M'),
+                    '处理状态':'待审核',
+                    '处理人':st.session_state.user
                 }
                 new_df = load_df(NEW_PROJECT_PATH)
                 new_df = pd.concat([new_df, pd.DataFrame([data])], ignore_index=True)
