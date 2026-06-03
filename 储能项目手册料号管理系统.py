@@ -271,16 +271,76 @@ if page == '🏠 首页':
 # ------------------------------
 # 📥 提交新项目【已精简优化：单下拉组件支持选择+手动输入，删除右侧冗余输入框】
 # ------------------------------
+# ------------------------------
+# 📥 提交新项目【优化：下拉选择+自由输入新内容，原生兼容无冗余】
+# ------------------------------
 elif page == '📥 提交新项目':
     st.header('📥 提交新项目配置')
     with st.form('new_form'):
-        # 整行单列布局，取消左右双栏冗余自定义框，selectbox开启allow_manual_input可直接打字新增内容
-        售卖区域 = st.selectbox('售卖区域（可选历史/N/A，可直接输入新内容）', area_opts, index=0)
-        产品型号版本 = st.selectbox('产品型号版本（可选历史/N/A，可直接输入新内容）', model_opts, index=0)
-        变流单元类型 = st.selectbox('变流单元类型（可选历史/N/A，可直接输入新内容）', converter_opts, index=0)
-        变压器规格 = st.selectbox('变压器规格（可选历史/N/A，可直接输入新内容）', trans_opts, index=0)
-        环网柜规格 = st.selectbox('环网柜规格（可选历史/N/A，可直接输入新内容）', cab_opts, index=0)
-        SCC规格 = st.selectbox('SCC规格（可选历史/N/A，可直接输入新内容）', scc_opts, index=0)
+        # 优化：使用 text_input + 下拉提示，支持选择历史值 + 手动输入全新内容
+        st.caption("💡 所有字段均可直接选择历史值，也可手动输入新内容")
+        
+        # 售卖区域：选择/输入
+        售卖区域 = st.text_input(
+            '售卖区域（选择历史/输入新内容）',
+            value="N/A",
+            help="可直接输入新区域，也可从下方选择历史值"
+        )
+        历史售卖区域 = st.selectbox("历史售卖区域", [""] + area_opts, label_visibility="collapsed")
+        if 历史售卖区域 and 历史售卖区域 != "":
+            售卖区域 = 历史售卖区域
+
+        # 产品型号版本：选择/输入
+        产品型号版本 = st.text_input(
+            '产品型号版本（选择历史/输入新内容）',
+            value="N/A",
+            help="可直接输入新型号，也可从下方选择历史值"
+        )
+        历史产品型号 = st.selectbox("历史产品型号", [""] + model_opts, label_visibility="collapsed")
+        if 历史产品型号 and 历史产品型号 != "":
+            产品型号版本 = 历史产品型号
+
+        # 变流单元类型：选择/输入
+        变流单元类型 = st.text_input(
+            '变流单元类型（选择历史/输入新内容）',
+            value="N/A",
+            help="可直接输入新类型，也可从下方选择历史值"
+        )
+        历史变流单元 = st.selectbox("历史变流单元类型", [""] + converter_opts, label_visibility="collapsed")
+        if 历史变流单元 and 历史变流单元 != "":
+            变流单元类型 = 历史变流单元
+
+        # 变压器规格：选择/输入
+        变压器规格 = st.text_input(
+            '变压器规格（选择历史/输入新内容）',
+            value="N/A",
+            help="可直接输入新规格，也可从下方选择历史值"
+        )
+        历史变压器 = st.selectbox("历史变压器规格", [""] + trans_opts, label_visibility="collapsed")
+        if 历史变压器 and 历史变压器 != "":
+            变压器规格 = 历史变压器
+
+        # 环网柜规格：选择/输入
+        环网柜规格 = st.text_input(
+            '环网柜规格（选择历史/输入新内容）',
+            value="N/A",
+            help="可直接输入新规格，也可从下方选择历史值"
+        )
+        历史环网柜 = st.selectbox("历史环网柜规格", [""] + cab_opts, label_visibility="collapsed")
+        if 历史环网柜 and 历史环网柜 != "":
+            环网柜规格 = 历史环网柜
+
+        # SCC规格：选择/输入
+        SCC规格 = st.text_input(
+            'SCC规格（选择历史/输入新内容）',
+            value="N/A",
+            help="可直接输入新规格，也可从下方选择历史值"
+        )
+        历史SCC = st.selectbox("历史SCC规格", [""] + scc_opts, label_visibility="collapsed")
+        if 历史SCC and 历史SCC != "":
+            SCC规格 = 历史SCC
+
+        # 项目名称（必填）
         项目名称 = st.text_input('项目名称（必填）').strip()
 
         submitted = st.form_submit_button('✅ 提交新项目', use_container_width=True)
