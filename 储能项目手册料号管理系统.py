@@ -273,22 +273,30 @@ if page == '🏠 首页':
 # ------------------------------
 elif page == '📥 提交新项目':
     st.header('📥 提交新项目配置')
-    st.caption('💡 下拉可选历史参数，输入框可直接改写/录入全新规格')
+    st.caption('✅ 下拉选择历史值 / 输入框直接手写新内容')
     with st.form('new_form'):
-        # 封装通用：下拉推荐+单行输入，一组一个标签，界面极简
-        def select_input(label, opt_list):
-            sel = st.selectbox(f"{label}｜下拉选已有", opt_list)
-            val = st.text_input(f"{label}｜手动录入新值", value=sel).strip()
-            return val
+        # 双列布局
+        col1, col2 = st.columns(2)
 
-        售卖区域 = select_input("售卖区域", area_opts)
-        产品型号版本 = select_input("产品型号版本", model_opts)
-        变流单元类型 = select_input("变流单元类型", converter_opts)
-        变压器规格 = select_input("变压器规格", trans_opts)
-        环网柜规格 = select_input("环网柜规格", cab_opts)
-        SCC规格 = select_input("SCC规格", scc_opts)
+        with col1:
+            # 封装成极简函数
+            def input_box(label, opts):
+                sel = st.selectbox(f"🔹 {label}", opts, label_visibility="visible")
+                val = st.text_input(" ", value=sel, placeholder="可直接改写内容", label_visibility="collapsed").strip()
+                return val
 
-        项目名称 = st.text_input('项目名称（必填）').strip()
+            售卖区域 = input_box("售卖区域", area_opts)
+            产品型号版本 = input_box("产品型号版本", model_opts)
+            变流单元类型 = input_box("变流单元类型", converter_opts)
+
+        with col2:
+            变压器规格 = input_box("变压器规格", trans_opts)
+            环网柜规格 = input_box("环网柜规格", cab_opts)
+            SCC规格 = input_box("SCC规格", scc_opts)
+
+        # 项目名称单独一行，更美观
+        st.divider()
+        项目名称 = st.text_input('📛 项目名称（必填）', placeholder="请输入完整项目名称").strip()
 
         submitted = st.form_submit_button('✅ 提交新项目', use_container_width=True)
         if submitted:
@@ -313,7 +321,6 @@ elif page == '📥 提交新项目':
                 new_df = pd.concat([new_df, pd.DataFrame([data])], ignore_index=True)
                 save_df(new_df, NEW_PROJECT_PATH)
                 st.success('提交成功，等待管理员审核')
-
 # ------------------------------
 # 📄 我的提交
 # ------------------------------
