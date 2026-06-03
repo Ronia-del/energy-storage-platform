@@ -273,35 +273,21 @@ if page == '🏠 首页':
 # ------------------------------
 elif page == '📥 提交新项目':
     st.header('📥 提交新项目配置')
-    st.caption("✅ 下拉框可快速选择历史值，也可以直接在输入框手写新内容")
-    
+    st.caption('💡 下拉可选历史参数，输入框可直接改写/录入全新规格')
     with st.form('new_form'):
-        # ========== 改造：下拉推荐 + 自由输入文本框 ==========
-        # 售卖区域
-        area_choice = st.selectbox("售卖区域（快速选择历史值）", area_opts)
-        售卖区域 = st.text_input("售卖区域（可直接手写覆盖）", value=area_choice).strip()
+        # 封装通用：下拉推荐+单行输入，一组一个标签，界面极简
+        def select_input(label, opt_list):
+            sel = st.selectbox(f"{label}｜下拉选已有", opt_list)
+            val = st.text_input(f"{label}｜手动录入新值", value=sel).strip()
+            return val
 
-        # 产品型号版本
-        model_choice = st.selectbox("产品型号版本（快速选择历史值）", model_opts)
-        产品型号版本 = st.text_input("产品型号版本（可直接手写覆盖）", value=model_choice).strip()
+        售卖区域 = select_input("售卖区域", area_opts)
+        产品型号版本 = select_input("产品型号版本", model_opts)
+        变流单元类型 = select_input("变流单元类型", converter_opts)
+        变压器规格 = select_input("变压器规格", trans_opts)
+        环网柜规格 = select_input("环网柜规格", cab_opts)
+        SCC规格 = select_input("SCC规格", scc_opts)
 
-        # 变流单元类型
-        converter_choice = st.selectbox("变流单元类型（快速选择历史值）", converter_opts)
-        变流单元类型 = st.text_input("变流单元类型（可直接手写覆盖）", value=converter_choice).strip()
-
-        # 变压器规格
-        trans_choice = st.selectbox("变压器规格（快速选择历史值）", trans_opts)
-        变压器规格 = st.text_input("变压器规格（可直接手写覆盖）", value=trans_choice).strip()
-
-        # 环网柜规格
-        cab_choice = st.selectbox("环网柜规格（快速选择历史值）", cab_opts)
-        环网柜规格 = st.text_input("环网柜规格（可直接手写覆盖）", value=cab_choice).strip()
-
-        # SCC规格
-        scc_choice = st.selectbox("SCC规格（快速选择历史值）", scc_opts)
-        SCC规格 = st.text_input("SCC规格（可直接手写覆盖）", value=scc_choice).strip()
-
-        # 项目名称（保持不变）
         项目名称 = st.text_input('项目名称（必填）').strip()
 
         submitted = st.form_submit_button('✅ 提交新项目', use_container_width=True)
