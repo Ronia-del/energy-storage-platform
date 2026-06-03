@@ -275,19 +275,21 @@ elif page == '📥 提交新项目':
     st.header('📥 提交新项目配置')
     st.caption('✅ 下拉选择 + 自由输入，三列超紧凑')
 
+    # 函数必须定义在form内部
     with st.form('new_form'):
         c1, c2, c3 = st.columns(3)
-
+        # 封装字段方法（放到form里面）
         def field(col, label, opts):
             with col:
                 sel = st.selectbox(label, opts)
                 val = st.text_input("→ 手写输入", value=sel).strip()
             return val
 
+        # 第一行
         售卖区域 = field(c1, "售卖区域", area_opts)
         产品型号版本 = field(c2, "产品型号版本", model_opts)
         变流单元类型 = field(c3, "变流单元类型", converter_opts)
-
+        # 第二行
         变压器规格 = field(c1, "变压器规格", trans_opts)
         环网柜规格 = field(c2, "环网柜规格", cab_opts)
         SCC规格 = field(c3, "SCC规格", scc_opts)
@@ -295,6 +297,7 @@ elif page == '📥 提交新项目':
         st.divider()
         项目名称 = st.text_input('项目名称（必填）').strip()
 
+        # 提交按钮在form内
         submitted = st.form_submit_button('✅ 提交新项目', use_container_width=True)
         if submitted:
             if not 项目名称:
