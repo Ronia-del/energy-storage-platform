@@ -1,0 +1,95 @@
+售卖区域,项目名称,产品型号版本,变流单元类型,变压器规格,环网柜规格,SCC规格,手册料号,手册状态,网站链接,
+国内,国能黑龙江通河,SC5000UD-MV-P3,,37kV干变,,,,,,
+国内,中盐阿拉善,SC5000UD-MV-P3,,37kV干变,,,,,,
+国内,中盐阿拉善,SC2500UD-MV-P3,,37kV干变,,,,,,
+国内,四川华电木里（10.20）,SC5000UD-MV-P3_V173,P3基础版,37kV华变,/,P3优化版,M0D02273,已归档,https://support.sungrowpower.com/ProductResourcesDetails?directoryId=child_model-3850505a-bb6b-4fdf-a922-7a8a681dd6d2&isQr=true,
+国内,四川阿坝,SC5000UD-MV-P3-V172,P3基础版,37kV华变,/,P3带空调,M0D02183,已归档,https://support.sungrowpower.com/ProductResourcesDetails?directoryId=child_model-b7c4198e-f68b-4ad1-8a88-d2b354969804&isQr=true,
+国内,新奥金牛（11.15）,SC5000UD-MV-P3-V143,P3优化版2.0,10kV干变,普通自研柜,P3二轮降本标准柜,M0D02284,已归档,https://support.sungrowpower.com/ProductResourcesDetails?directoryId=child_model-210462a6-552c-49da-a547-ebffac82640a&isQr=true,
+国内,郎溪怀阳（11.05）,SC5000UD-MV-P3-V1126,P3优化版1.0,37kV干变,,P3优化版,M0D02085,已归档,https://support.sungrowpower.com/ProductResourcesDetails?directoryId=child_model-6cb86739-5518-4728-99e9-38f06d2b4b3a&isQr=true,
+国内,郎溪怀阳（11.05）,SC7500UD-MV-P3-V1115,P3拓展版,37kV干变,,拓展版,M0D02092,已归档,https://support.sungrowpower.com/ProductResourcesDetails?directoryId=child_model-c838a86d-d8c5-4631-a5f5-38779319f174&isQr=true,
+国内,荆州洪湖华电（10.20）,SC2500UD-MV-P3_V116,P3优化版2.0,37kV干变,,P3二轮降本标准柜,M0D02250,已归档,https://support.sungrowpower.com/ProductResourcesDetails?directoryId=child_model-1d40a9e1-ffa9-463e-94b0-0f13709095a3&isQr=true,
+国内,唐山乐亭（11.10）,SC7500UD-MV-P3_V1112,P3拓展版,37kV干变,,拓展版,M0D02107,已归档,https://support.sungrowpower.com/ProductResourcesDetails?directoryId=child_model-cd7c1df3-4085-4390-88d5-51f92f14e00d&isQr=true,
+国内,唐山乐亭（11.10）,SC5000UD-MV-P3_V1127（基础版量产）,P3基础版,37kV干变,,,M0D00013,已归档,,
+国内,中电建12局盐源,SC3750UD-MV-P3-FM_V171,P3构网1.0,37kV华变,普通自研柜,P3优化版,M0D02093,已归档,https://support.sungrowpower.com/ProductResourcesDetails?directoryId=child_model-2b1ceea3-d633-47b2-b447-14d025e87722&isQr=true,
+国内,洪湖二期（10.21）,SC7500UD-MV-P3-V1121,P3拓展版,37kV干变,普通自研柜,拓展版,M0D02107,已归档,https://support.sungrowpower.com/ProductResourcesDetails?directoryId=child_model-cd7c1df3-4085-4390-88d5-51f92f14e00d&isQr=true,
+国内,洪湖二期（10.21）,SC2500UD-MV-P3-V117,P3基础版,37kV干变,普通自研柜,P3带空调,M0D00796,已归档,,
+国内,取消 河南灵宝,SC7500UD-MV-P3-V1122,P3拓展版,37kV干变,普通自研柜,拓展版,M0D02107,暂停,https://support.sungrowpower.com/ProductResourcesDetails?directoryId=child_model-cd7c1df3-4085-4390-88d5-51f92f14e00d&isQr=true,
+国内,取消 河南灵宝,SC2500UD-MV-P3_V118,P3基础版,37kV干变,普通自研柜,P3带空调,M0D00796,暂停,,
+国内,元工晋中（11.30）,SC7500UD-MV-P3-V1123,P3优化版2.0,37kV干变,普通自研柜,拓展版,M0D02337,已归档,https://support.sungrowpower.com/ProductResourcesDetails?directoryId=child_model-e69cd77d-fb03-4dc4-b4b5-c151a906ce65&isQr=true,
+国内,元工晋中（12.15）,SC2500UD-MV-P3-V119,P3优化版2.0,37kV干变,普通自研柜,P3二轮降本标准柜,M0D02331,已归档,https://support.sungrowpower.com/ProductResourcesDetails?directoryId=child_model-de03e393-1209-4502-9b00-75ea824f7aaa&isQr=true,
+国内,暂停 内蒙古包头200MW1200MWH项目（11.10）,SC5000UD-MV-P3-V1130,P3优化版2.0,37kV干变,普通自研柜,拓展版标准柜,M0D02332,暂停,https://support.sungrowpower.com/ProductResourcesDetails?directoryId=child_model-1eb4d0dd-d785-4c15-af4f-35c5f4c5f24e&isQr=true,
+国内,通威新能源天门沉湖66MW/132MWh储能项目（11.10）,SC7500UD-MV-P3_V1124,P3优化版2.0,37kV干变,普通自研柜,拓展版,M0D02337,已归档,https://support.sungrowpower.com/ProductResourcesDetails?directoryId=child_model-e69cd77d-fb03-4dc4-b4b5-c151a906ce65&isQr=true,
+国内,粤水电西藏曲水8.36MW/33.44MWh储能项目（11.29）下出线,SC3750UD-MV-P3-FM-V173,P3构网1.0,36.75kV油变,,P3二轮降本标准柜,M0D02336,已归档,https://support.sungrowpower.com/ProductResourcesDetails?directoryId=child_model-b2349342-e42f-4c67-a24f-6fefa1e12985&isQr=true,
+国内,（单卖）中楷西藏阿里（9.25）,SC2500UD-MV-P3-FM-V172_V173,P3构网1.0,37kV华变,,订单特殊定制,M0D02216,已归档,https://support.sungrowpower.com/ProductResourcesDetails?directoryId=child_model-2c524e75-ae71-4859-b456-a571af5c5fab&isQr=true,
+国内,国顺科技集团河北隆尧二期200MW/400MWh储能项目（11.30）,SC7500UD-MV-P3-V1125 ,P3优化版2.0,37kV干变,普通自研柜,拓展版,M0D02337,已归档,https://support.sungrowpower.com/ProductResourcesDetails?directoryId=child_model-e69cd77d-fb03-4dc4-b4b5-c151a906ce65&isQr=true,
+国内,国顺科技集团河北隆尧二期200MW/400MWh储能项目（12.15）,SC5000UD-MV-P3-V1131 ,P3优化版2.0,37kV干变,普通自研柜,P3二轮降本标准柜,M0D02377,开发中,https://support.sungrowpower.com/ProductResourcesDetails?directoryId=child_model-c0bb9baa-1110-475a-b90b-cf119133a410&isQr=true,
+IEC,南非Herhouldts（2026.1.12）,SC1375UD-MV-V121,UD1.0,24kV油变,,,M0D02411,已归档,https://support.sungrowpower.com/ProductResourcesDetails?directoryId=child_model-4eef10da-c369-4d60-9a6d-fefd24953299&isQr=true,
+国内,"中电建小金川18MW34MWH储能项目
+（注意吊装方案更改）后出线
+（12.25）",SC3750UD-MV-P3-FM-V174,P3构网1.0,37kV华变,自研SF6,P3二轮降本标准柜,M0D02389,已归档,https://support.sungrowpower.com/ProductResourcesDetails?directoryId=child_model-dfeb9d1c-befb-48c6-9c73-569f8c9338bd&isQr=true,
+国内,绥中高领储能150MW300MWH储能项目（暂停，26//3~4月重启）,SC3750UD-MV-P3-FM_V113,P3构网2.0（降本）,37kV干变,普通自研柜,P3二轮降本标准柜,M0D02436,待开发,https://support.sungrowpower.com/ProductResourcesDetails?directoryId=child_model-c1c12f2a-8f28-458c-b4f4-cd30cd70595f&isQr=true,
+国内,山西院兴泰二期90MW/180MWh储能项目（11.20）,SC7500UD-MV-P3-V1126,P3优化版2.0,37kV干变,普通自研柜,拓展版,M0D02337,已归档,https://support.sungrowpower.com/ProductResourcesDetails?directoryId=child_model-e69cd77d-fb03-4dc4-b4b5-c151a906ce65&isQr=true,
+国内,西藏阿里麻米措矿业160MW构网储能PCS项目（12.0）,单机单售：主机 SC1250UD-FM-V113、从机SC1250UD-FM-V114,P3构网2.0（降本）,,,,M0D02523,已归档,https://support.sungrowpower.com/ProductResourcesDetails?directoryId=child_model-783da266-b64e-43de-a73f-ffe276ea48c2&isQr=true,
+国内,"华电宁夏新能源银川市120MW237MWH储能项目
+（2026.4.25）",SC7500UD-MV-P3_V1127,P3优化版2.0,37kV干变,普通自研柜,,M0D02337,已归档,https://support.sungrowpower.com/ProductResourcesDetails?directoryId=child_model-e69cd77d-fb03-4dc4-b4b5-c151a906ce65&isQr=true,
+国内,欣旺达电子甲醇10MW储能PCS一体机项目（2026.2.3）,SC2500UD-MV-P3-V141,P3基础版,10kV干变,,P3二轮降本标准柜,M0D02536,已归档,https://support.sungrowpower.com/ProductResourcesDetails?directoryId=child_model-cf2a2882-24e9-4788-9803-c0bd3bd5b500&isQr=true,
+国内,"济宁海螺10MW20MWH项目
+（2026.1.30)",SC5000UD-MV-P3-V174,P3优化版2.0,10kV华变,,P3二轮降本标准柜,M0D02539,已归档,https://support.sungrowpower.com/ProductResourcesDetails?directoryId=child_model-95f36573-0cc6-4f89-b186-91e817ceb9c0&isQr=true,
+国内,"西藏华电山南措美一期80MW风电配16MW/64MWh储能构网项目
+（2026.3.20）",SC3750UD-MV-P3-FM-V175,P3构网2.0（降本）,37kV华变,自研SF6,标准柜,M0D02551,已归档,https://support.sungrowpower.com/ProductResourcesDetails?directoryId=child_model-31531a67-8abf-4a86-8900-7ecd341afaf0&isQr=true,
+国内,"鲁能青海格尔木东岳150MW/600MWh构网型储能项目
+（2026.2.27）",SC3750UD-MV-P3-FM_V114,P3构网2.0（降本）,37kV干变,普通自研柜,P3二轮降本标准柜,M0D02436,暂停,https://support.sungrowpower.com/ProductResourcesDetails?directoryId=child_model-c1c12f2a-8f28-458c-b4f4-cd30cd70595f&isQr=true,
+国内,广东智元电禾佛山2.5MW5MWH储能项目（1.30）,SC2500UD-MV-P3_V142,P3优化版2.0,10kV干变,普通自研柜,P3二轮降本标准柜,M0D02558,已归档,https://support.sungrowpower.com/ProductResourcesDetails?directoryId=child_model-0a9d1e23-fe19-4d29-8b63-0b1f466b62f1&isQr=true,
+国内,"金麒麟奈曼旗增量配电网项目二期10MW/40MWh+4.17MWh项目
+（1.25）",SC5000UD-MV-P2_V1123,P2,37kV干变,外购空气柜,订单特殊定制,M0D02588,已归档,https://support.sungrowpower.com/ProductResourcesDetails?directoryId=child_model-8a5129a2-8c8e-4bf6-81d2-478eec405a6f&isQr=true,
+国内,"国顺科技深泽300MW/1200MWh独立储能项目
+（1.30）",SC7500UD-MV-P3_V1128,P3优化版2.0,37kV干变,普通自研柜,拓展版,M0D02337,已归档,https://support.sungrowpower.com/ProductResourcesDetails?directoryId=child_model-e69cd77d-fb03-4dc4-b4b5-c151a906ce65&isQr=true,
+IEC,"特变国际马里（英+法语+中）
+（3.30）",SC8000UD-MV-V124,UD1.0,,,,M0D02641,开发中,https://support.sungrowpower.com/ProductResourcesDetails?directoryId=child_model-9d9f8d5a-eb74-4cee-9c6f-b84576fe17c0&isQr=true,
+IEC,"特变国际马里（英+法语+中）
+（3.30）",SC4000UD-MV-V1251,UD1.0,,,,M0D02643,开发中,https://support.sungrowpower.com/ProductResourcesDetails?directoryId=child_model-1e3c5091-acf6-4174-84cc-7fe4d8f53885&isQr=true,
+IEC,"中材乌兹（英+俄语）
+（3.15）",SC8000UD-MV-V123 ,UD1.0,,,,M0D02642,已归档,https://support.sungrowpower.com/ProductResourcesDetails?directoryId=child_model-6bc732b1-95a9-4359-9c12-d377576449cf&isQr=true,
+IEC,"中材乌兹（英+俄语）
+（3.15）",SC4000UD-MV-V1250,UD1.0,,,,M0D02644,已归档,https://support.sungrowpower.com/ProductResourcesDetails?directoryId=child_model-34503200-0b7c-4582-bdf0-4c1b5504a694&isQr=true,
+国内,"华辰河南三门峡市
+（1.25）",SC2500UD-P3-V1162、SC2500UD-P3-V1163、SC2500UD-P3-V1164,P3优化版2.0,,,,M0D02645,已归档,https://support.sungrowpower.com/ProductResourcesDetails?directoryId=child_model-1714d205-aa87-467d-8db5-68c9d63a3dc1&isQr=true,
+国内,"国网冀北电力河北张家口市
+（4.15）",SC1250UD-MV-P3-FM-V112,P3构网2.0（降本）,38.5kVA干变(委外),,P3二轮降本标准柜,M0D02750,开发中,https://support.sungrowpower.com/ProductResourcesDetails?directoryId=child_model-5ca0d523-f8d2-42de-be7f-5f2862051ba9&isQr=true,备注：此项目阳光仅生产单机及SCC柜，其余干变、空气柜、户外房在华辰生产，并由华辰集成一体机。委外器件相关参数与研发对接即可
+国内,"	华电西藏昌都贡觉7MW/14MWh储能项目
+（4.20）","SC3750UD-MV-P3-FM_V176
+",P3构网2.0（降本）,37kV华变,自研SF6,P3二轮降本标准柜,M0D02551,已归档,https://support.sungrowpower.com/ProductResourcesDetails?directoryId=child_model-31531a67-8abf-4a86-8900-7ecd341afaf0&isQr=true,
+国内,"湖北光谷东控股湖北武汉市20MW/40MWh储能项目
+（5.11）","SC7500UD-MV-P3_V1129
+",P3优化版2.0,37kV干变,,拓展版,M0D02337,已归档,https://support.sungrowpower.com/ProductResourcesDetails?directoryId=child_model-e69cd77d-fb03-4dc4-b4b5-c151a906ce65&isQr=true,
+国内,"湖北光谷东控股湖北武汉市20MW/40MWh储能项目（尾箱）
+（5.11）","SC5000UD-MV-P3_V1133
+",P3优化版2.0,37kV干变,,P3二轮降本标准柜,M0D02377,待开发,https://support.sungrowpower.com/ProductResourcesDetails?directoryId=child_model-c0bb9baa-1110-475a-b90b-cf119133a410&isQr=true,
+国内,"华电哈密十三间房220MW880MWH项目
+（6.23）",SC7500UD-MV-P3-V1111,P3优化版2.0,,,,M0D01985,待开发,https://support.sungrowpower.com/ProductResourcesDetails?directoryId=child_model-8346284d-e7db-4850-a46d-a0ba3bab1e0e&isQr=true,
+IEC,"德国Aquila项目（户外环网柜）
+（英+德）
+（10.）",SC3450UD-MV-V166,UD1.0,,,,M0D02845,待开发,https://support.sungrowpower.com/ProductResourcesDetails?directoryId=child_model-744bcf55-907f-46a0-81c2-393b0b84a81b&isQr=true,
+国内,"清源飞控青海绿发P4飞轮一体机项目
+（5.20）",SC3450UD-MV-P4-V112,P4,37kV干变,普通自研柜,P4标准版,M0D02862,待开发,https://support.sungrowpower.com/ProductResourcesDetails?directoryId=child_model-96d9f674-7184-457e-bb40-25c815f68d83&isQr=true,备注：此项目辅助变委外生产，由供应商直发现场
+国内,"衡智电力安徽亳州38.2MW76.4MWH储能项目
+（5.20）",SC7500UD-MV-P3_V1130,P3优化版2.0,37kV干变,普通自研柜,,M0D02337,已归档,https://support.sungrowpower.com/ProductResourcesDetails?directoryId=child_model-e69cd77d-fb03-4dc4-b4b5-c151a906ce65&isQr=true,
+国内,"衡智电力安徽亳州38.2MW76.4MWH储能项目
+（5.20）",SC5000UD-MV-P3_V1134,P3优化版2.0,37kV干变,普通自研柜,,M0D02377,待开发,https://support.sungrowpower.com/ProductResourcesDetails?directoryId=child_model-c0bb9baa-1110-475a-b90b-cf119133a410&isQr=true,
+国内,"新疆哈密鑫网20MW40MWh项目
+（5.15）","SC5000UD-MV-P3_V1135
+",P3优化版2.0,36.5kV干变定制,普通自研柜,P3二轮降本标准柜,M0D02377,待开发,https://support.sungrowpower.com/ProductResourcesDetails?directoryId=child_model-c0bb9baa-1110-475a-b90b-cf119133a410&isQr=true,
+国内,"黄河大庆四期5MW10MWH项目
+（6.30）",SC2500UD-MV-P3_V151,P3优化版2.0,800V干变定制,定制自研柜800V,P3二轮降本标准柜,M0D02939,待开发,https://support.sungrowpower.com/ProductResourcesDetails?directoryId=child_model-2aff985c-9327-490b-a257-2990aecf1a07&isQr=true,
+国内,合肥花岗,SC10000UD-MV-P4,P4,,,,,已归档,https://support.sungrowpower.com/ProductResourcesDetails?directoryId=child_model-431ad5c5-cfea-485c-96a7-220121165d9b&isQr=true,
+国内,"冀能售电
+(6.5)",SC1725UD-P4(单机单售),P4,,,,M0D02957,待开发,https://support.sungrowpower.com/ProductResourcesDetails?directoryId=child_model-98ba9d84-d755-4f19-82ca-f775c7c7e541&isQr=true,
+国内,唐山乐亭,SC7500UD-MV-P3_V1132（铝变版本）,P3优化版2.0,,,,M0D02959,待开发,https://support.sungrowpower.com/ProductResourcesDetails?directoryId=child_model-80b27c1a-16ba-4bea-9dd3-078a435f5281&isQr=true,
+IEC,"ACWA乌兹撒马尔罕遮阳棚项目
+(9.",SC5500UD-MV-V1211/SC5500UD-MV-V1212,UD1.0,,,,M0D02014,待开发,,
+国内,阳光新能源勺摩光伏配套24MW/48MWh储能项目-主箱,SC7500UD-MV-P3_V1133（铝变版本）,P3优化版2.0,37kV干变,普通自研柜,拓展版,M0D02959,待开发,https://support.sungrowpower.com/ProductResourcesDetails?directoryId=child_model-80b27c1a-16ba-4bea-9dd3-078a435f5281&isQr=true,
+国内,阳光新能源勺摩光伏配套24MW/48MWh储能项目-尾箱,SC5000UD-MV-P3_V1136（铝变加高版本）,P3优化版2.0,37kV干变,普通自研柜,P3二轮降本标准柜,M0D03010,待开发,https://support.sungrowpower.com/ProductResourcesDetails?directoryId=child_model-125d7547-98db-4d25-b2cb-83a0426a4c21&isQr=true,
+国内,阳光新能源安徽耿皇100MW200MWh储能项目-主箱,SC7500UD-MV-P3_V1134（铝变版本）,P3优化版2.0,37kV干变,普通自研柜,拓展版,M0D02959,待开发,https://support.sungrowpower.com/ProductResourcesDetails?directoryId=child_model-80b27c1a-16ba-4bea-9dd3-078a435f5281&isQr=true,
+国内,阳光新能源安徽耿皇100MW200MWh储能项目-尾箱,SC2500UD-MV-P3_V1110,P3优化版2.0,37kV干变,普通自研柜,P3二轮降本标准柜,M0D02331,已归档,https://support.sungrowpower.com/ProductResourcesDetails?directoryId=child_model-de03e393-1209-4502-9b00-75ea824f7aaa&isQr=true,
+国内,华能雄安新能源河北廊坊市5.6MW/11.2MWh储能项目,SC7500UD-MV-P3_V1135,P3优化版2.0,37kV干变,普通自研柜,拓展版,M0D02337,已归档,https://support.sungrowpower.com/ProductResourcesDetails?directoryId=child_model-e69cd77d-fb03-4dc4-b4b5-c151a906ce65&isQr=true,
+国内,众树广东中山坦洲镇200MW储能PCS一体机项目,SC5000UD-MV-P3-V1137,P3优化版2.0,37kV干变,普通自研柜,P3带空调,M0D03073,待开发,https://support.sungrowpower.com/ProductResourcesDetails?directoryId=child_model-f438bbe4-af92-4977-a427-86185ea516f4&isQr=true,
