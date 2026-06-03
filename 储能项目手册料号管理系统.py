@@ -273,30 +273,26 @@ if page == '🏠 首页':
 # ------------------------------
 elif page == '📥 提交新项目':
     st.header('📥 提交新项目配置')
-    st.caption('✅ 下拉选择历史值 / 输入框直接手写新内容')
+    st.caption('✅ 可直接下拉选择，也可直接打字输入新内容')
+
     with st.form('new_form'):
-        # 双列布局
         col1, col2 = st.columns(2)
 
-        with col1:
-            # 封装成极简函数
-            def input_box(label, opts):
-                sel = st.selectbox(f"🔹 {label}", opts, label_visibility="visible")
-                val = st.text_input(" ", value=sel, placeholder="可直接改写内容", label_visibility="collapsed").strip()
-                return val
+        def combo_input(label, options):
+            return col1.text_input(label, placeholder="输入新内容 或 从下拉选择") if col1.checkbox(label+" → 手动输入", value=False) else col2.selectbox(label, options)
 
-            售卖区域 = input_box("售卖区域", area_opts)
-            产品型号版本 = input_box("产品型号版本", model_opts)
-            变流单元类型 = input_box("变流单元类型", converter_opts)
+        with col1:
+            售卖区域 = combo_input("售卖区域", area_opts)
+            产品型号版本 = combo_input("产品型号版本", model_opts)
+            变流单元类型 = combo_input("变流单元类型", converter_opts)
 
         with col2:
-            变压器规格 = input_box("变压器规格", trans_opts)
-            环网柜规格 = input_box("环网柜规格", cab_opts)
-            SCC规格 = input_box("SCC规格", scc_opts)
+            变压器规格 = combo_input("变压器规格", trans_opts)
+            环网柜规格 = combo_input("环网柜规格", cab_opts)
+            SCC规格 = combo_input("SCC规格", scc_opts)
 
-        # 项目名称单独一行，更美观
         st.divider()
-        项目名称 = st.text_input('📛 项目名称（必填）', placeholder="请输入完整项目名称").strip()
+        项目名称 = st.text_input('项目名称（必填）', placeholder="请输入项目名称").strip()
 
         submitted = st.form_submit_button('✅ 提交新项目', use_container_width=True)
         if submitted:
@@ -304,12 +300,12 @@ elif page == '📥 提交新项目':
                 st.error('项目名称不能为空')
             else:
                 data = {
-                    '售卖区域': 售卖区域.strip(),
-                    '产品型号版本': 产品型号版本.strip(),
-                    '变流单元类型': 变流单元类型.strip(),
-                    '变压器规格': 变压器规格.strip(),
-                    '环网柜规格': 环网柜规格.strip(),
-                    'SCC规格': SCC规格.strip(),
+                    '售卖区域': str(售卖区域).strip(),
+                    '产品型号版本': str(产品型号版本).strip(),
+                    '变流单元类型': str(变流单元类型).strip(),
+                    '变压器规格': str(变压器规格).strip(),
+                    '环网柜规格': str(环网柜规格).strip(),
+                    'SCC规格': str(SCC规格).strip(),
                     '项目名称': 项目名称,
                     '手册料号': '',
                     '网址链接': '',
