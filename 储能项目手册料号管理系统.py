@@ -1,337 +1,528 @@
 import streamlit as st
 import pandas as pd
-import sqlite3
-import hashlib
-import threading
+import os
 from datetime import datetime
-from contextlib import closing
-import shutil
+import hashlib
+from io import BytesIO
 
-# -------------------------- 页面基础配置 --------------------------
-st.set_page_config(
-    page_title="储能项目匹配平台",
-    page_icon="⚡",
-    layout="wide",
-    initial_sidebar_state="expanded"
-)
+# ===================== 全局样式美化（大气商务版） =====================
+st.markdown("""
+<style>
+/* 整体背景 */
+.stApp {
+    background-color: #f8f9fa;
+}
+/* 左侧边栏加宽 */
+section[data-testid="stSidebar"] {
+    min-width: 260px;
+    max-width: 260px;
+    background-color: #ffffff;
+    border-right: 1px solid #e5e7eb;
+}
+/* 侧边栏标题 */
+section[data-testid="stSidebar"] > div:first-child {
+    padding-top: 2rem;
+    padding-bottom: 1rem;
+}
+/* 菜单选项美化 */
+div[data-testid="stRadio"] > label {
+    font-size: 15px;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 10px;
+}
+div[data-testid="stRadio"] > div > div {
+    padding: 10px 14px;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 500;
+    margin-bottom: 6px;
+    transition: all 0.2s ease;
+}
+div[data-testid="stRadio"] > div > div:hover {
+    background-color: #f3f4f6;
+}
+div[data-testid="stRadio"] > div > div[aria-selected="true"] {
+    background-color: #0052cc;
+    color: white !important;
+    font-weight: 600;
+}
+/* 按钮统一大气 */
+button[data-testid="baseButton-secondary"],
+button[data-testid="baseButton-primary"] {
+    border-radius: 10px !important;
+    height: 3.0em !important;
+    font-size: 15px !important;
+    font-weight: 600 !important;
+}
+/* 标题样式 */
+h1 {
+    font-size: 26px !important;
+    font-weight: 700 !important;
+    color: #111827 !important;
+    margin-bottom: 1rem !important;
+}
+h2, h3 {
+    font-weight: 600 !important;
+    color: #1f2937 !important;
+}
+/* 卡片/输入框 */
+div[data-testid="stTextInput"] input,
+div[data-testid="stSelect"] select {
+    border-radius: 10px !important;
+}
+/* 表格 */
+div[data-testid="stDataFrame"] {
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+/* 欢迎卡片样式 */
+.welcome-card {
+    background: linear-gradient(135deg, #0052cc 0%, #0066ff 100%);
+    padding: 40px;
+    border-radius: 20px;
+    text-align: center;
+    color: white;
+    margin-bottom: 30px;
+    box-shadow: 0 10px 30px rgba(0,82,204,0.2);
+}
+.welcome-card h1 {
+    color: white !important;
+    font-size: 32px !important;
+    margin-bottom: 10px !important;
+}
+.welcome-card p {
+    font-size: 18px;
+    opacity: 0.9;
+}
+</style>
+""", unsafe_allow_html=True)
 
-# 数据库锁（防止多人并发写入冲突）
-DB_LOCK = threading.Lock()
+# ===================== 页面配置 =====================
+st.set_page_config(page_title="储能项目手册料号申请及管理系统", page_icon="⚡", layout="wide")
 
-# -------------------------- 数据库初始化核心 --------------------------
-def init_database():
-    """初始化所有数据表：用户表、新项目表、历史项目表"""
-    with closing(sqlite3.connect('energy_storage.db', check_same_thread=False)) as conn:
-        cursor = conn.cursor()
+# ===================== 核心字段 =====================
+CORE_FIELDS = ['产品型号版本', '变流单元类型', '变压器规格', '环网柜规格', 'SCC规格']
+INFO_FIELDS = ['售卖区域', '项目名称']
+SYSTEM_FIELDS = ['手册料号', '网址链接', '创建时间', '处理状态', '处理人']
+ALL_FIELDS = CORE_FIELDS + INFO_FIELDS + SYSTEM_FIELDS
 
-        # 用户表
-        cursor.execute('''
-        CREATE TABLE IF NOT EXISTS users (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            username TEXT UNIQUE NOT NULL,
-            password TEXT NOT NULL,
-            role TEXT NOT NULL DEFAULT '普通用户'
-        )
-        ''')
+# 处理状态下拉选项
+STATUS_OPTIONS = ['待审核', '已借用', '已手动录入', '已批量导入', '已归档', '已取消']
 
-        # 待审核新项目表
-        cursor.execute('''
-        CREATE TABLE IF NOT EXISTS new_projects (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            产品型号版本 TEXT,
-            变流单元类型 TEXT,
-            变压器规格 TEXT,
-            环网柜规格 TEXT,
-            SCC规格 TEXT,
-            售卖区域 TEXT,
-            项目名称 TEXT,
-            手册料号 TEXT,
-            网址链接 TEXT,
-            创建时间 TEXT,
-            处理状态 TEXT DEFAULT '待审核',
-            处理人 TEXT DEFAULT ''
-        )
-        ''')
+# ===================== 文件路径 =====================
+BASE = os.path.dirname(os.path.abspath(__file__))
+HISTORY_PATH = os.path.join(BASE, "历史项目库.csv")
+NEW_PROJECT_PATH = os.path.join(BASE, "待审核新项目.csv")
+USER_PATH = os.path.join(BASE, "用户.csv")
+SOURCE_CONFIG_PATH = os.path.join(BASE, "储能项目配置表.csv")
+IMPORT_FLAG_PATH = os.path.join(BASE, ".imported")
 
-        # 历史项目库
-        cursor.execute('''
-        CREATE TABLE IF NOT EXISTS history_projects (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            产品型号版本 TEXT,
-            变流单元类型 TEXT,
-            变压器规格 TEXT,
-            环网柜规格 TEXT,
-            SCC规格 TEXT,
-            售卖区域 TEXT,
-            项目名称 TEXT,
-            手册料号 TEXT,
-            网址链接 TEXT,
-            创建时间 TEXT,
-            处理状态 TEXT,
-            处理人 TEXT
-        )
-        ''')
+# ===================== 工具函数 =====================
+def sha256(s):
+    return hashlib.sha256(str(s).encode()).hexdigest()
 
-        # 初始化默认管理员账号（admin/admin123）
-        default_admin_pwd = encrypt_password("admin123")
-        cursor.execute("SELECT * FROM users WHERE username = 'admin'")
-        if not cursor.fetchone():
-            cursor.execute(
-                "INSERT INTO users (username, password, role) VALUES (?, ?, ?)",
-                ("admin", default_admin_pwd, "管理员")
-            )
-
-        conn.commit()
-
-# -------------------------- 通用工具函数 --------------------------
-def encrypt_password(pwd):
-    """密码加密"""
-    return hashlib.sha256(pwd.encode('utf-8')).hexdigest()
-
-def load_table(table_name):
-    """从数据库读取表为DataFrame"""
-    with DB_LOCK:
-        with closing(sqlite3.connect('energy_storage.db', check_same_thread=False)) as conn:
-            return pd.read_sql(f"SELECT * FROM {table_name}", conn)
-
-def save_table(df, table_name):
-    """保存DataFrame到数据库表（覆盖写入）"""
-    with DB_LOCK:
-        with closing(sqlite3.connect('energy_storage.db', check_same_thread=False)) as conn:
-            conn.execute(f"DELETE FROM {table_name}")
-            df.to_sql(table_name, conn, index=False, if_exists="append")
-
-def backup_database():
-    """数据库备份"""
-    now = datetime.now().strftime("%Y%m%d_%H%M%S")
-    backup_file = f"backup_energy_storage_{now}.db"
-    shutil.copy("energy_storage.db", backup_file)
-    return backup_file
-
-# -------------------------- 登录/注册/权限 --------------------------
-def login_user(username, pwd):
-    encrypted = encrypt_password(pwd)
-    with closing(sqlite3.connect('energy_storage.db', check_same_thread=False)) as conn:
-        cursor = conn.cursor()
-        cursor.execute("SELECT * FROM users WHERE username=? AND password=?", (username, encrypted))
-        return cursor.fetchone()
-
-def add_user(username, pwd, role="普通用户"):
+def load_df(path):
+    if not os.path.exists(path):
+        return pd.DataFrame(columns=ALL_FIELDS)
     try:
-        encrypted = encrypt_password(pwd)
-        with closing(sqlite3.connect('energy_storage.db', check_same_thread=False)) as conn:
-            cursor = conn.cursor()
-            cursor.execute(
-                "INSERT INTO users (username, password, role) VALUES (?, ?, ?)",
-                (username, encrypted, role)
-            )
-            conn.commit()
-            return True
+        df = pd.read_csv(path, encoding='utf-8-sig')
+        return df.fillna("").astype(str)
     except:
-        return False
+        return pd.DataFrame(columns=ALL_FIELDS)
 
-# -------------------------- 页面功能：登录 --------------------------
-def show_login_page():
-    st.title("⚡ 储能项目匹配平台 - 登录")
-    username = st.text_input("账号")
-    pwd = st.text_input("密码", type="password")
-    col1, col2 = st.columns(2)
+def save_df(df, path):
+    df.fillna("").astype(str).to_csv(path, index=False, encoding='utf-8-sig')
 
-    with col1:
-        if st.button("登录"):
-            user = login_user(username, pwd)
-            if user:
-                st.session_state["login"] = True
-                st.session_state["username"] = username
-                st.session_state["role"] = user[3]
-                st.success(f"欢迎回来，{username}！")
-                st.rerun()
-            else:
-                st.error("账号或密码错误")
+def match_rate(new_item, hist_item):
+    cnt = 0
+    for f in CORE_FIELDS:
+        a = str(new_item.get(f, "")).strip().lower()
+        b = str(hist_item.get(f, "")).strip().lower()
+        if a == b and a != "" and a != "N/A":
+            cnt += 1
+    total = len([f for f in CORE_FIELDS if str(new_item.get(f, "")).strip() != "" and str(new_item.get(f, "")).strip() != "N/A"])
+    return round(cnt / total * 100, 1) if total > 0 else 0.0
 
-    with col2:
-        if st.button("注册新用户"):
-            if add_user(username, pwd):
-                st.success("注册成功！请登录")
-            else:
-                st.error("注册失败：账号已存在")
+def to_excel(df):
+    output = BytesIO()
+    with pd.ExcelWriter(output, engine='openpyxl') as writer:
+        df.to_excel(writer, index=False, sheet_name='数据')
+    return output.getvalue()
 
-    st.caption("默认管理员：admin / admin123")
+# 获取历史下拉选项（去重、排序、去空 + 加 N/A）
+def get_options(df, col):
+    if col not in df.columns:
+        return ["N/A"]
+    opts = sorted([x.strip() for x in df[col].unique() if x.strip() != ''])
+    return ["N/A"] + opts
 
-# -------------------------- 页面功能：首页 --------------------------
-def show_home():
-    st.title("⚡ 储能项目匹配管理平台")
-    st.markdown("""
-    ### 平台功能
-    - ✅ 提交储能项目信息
-    - ✅ 管理员审核项目
-    - ✅ 历史项目库查询
-    - ✅ 多人在线协作
-    """)
-    st.success(f"当前登录：{st.session_state['username']} | 权限：{st.session_state['role']}")
+# ===================== 初始化 =====================
+if not os.path.exists(USER_PATH):
+    save_df(pd.DataFrame(columns=['username','pwd','role']), USER_PATH)
 
-# -------------------------- 页面功能：提交新项目 --------------------------
-def show_submit_project():
-    st.title("📝 提交新项目")
-    with st.form("new_project"):
-        col1, col2 = st.columns(2)
-        with col1:
-            产品型号版本 = st.text_input("产品型号版本")
-            变流单元类型 = st.text_input("变流单元类型")
-            变压器规格 = st.text_input("变压器规格")
-            环网柜规格 = st.text_input("环网柜规格")
-        with col2:
-            SCC规格 = st.text_input("SCC规格")
-            售卖区域 = st.text_input("售卖区域")
-            项目名称 = st.text_input("项目名称")
-            手册料号 = st.text_input("手册料号")
-            网址链接 = st.text_input("网址链接")
+if not os.path.exists(NEW_PROJECT_PATH):
+    save_df(pd.DataFrame(columns=ALL_FIELDS), NEW_PROJECT_PATH)
 
-        submitted = st.form_submit_button("提交项目")
+# 首次自动导入原始配置表
+if not os.path.exists(HISTORY_PATH) and os.path.exists(SOURCE_CONFIG_PATH) and not os.path.exists(IMPORT_FLAG_PATH):
+    src = pd.read_csv(SOURCE_CONFIG_PATH, encoding='utf-8-sig').fillna("")
+    if "网站链接" in src.columns:
+        src = src.rename(columns={"网站链接":"网址链接"})
+    src["创建时间"] = datetime.now().strftime("%Y-%m-%d %H:%M")
+    src["处理状态"] = src.get("手册状态", "已归档").fillna("已归档")
+    src["处理人"] = "admin"
+    for c in ALL_FIELDS:
+        if c not in src.columns:
+            src[c] = ""
+    src = src[ALL_FIELDS]
+    save_df(src, HISTORY_PATH)
+    with open(IMPORT_FLAG_PATH, "w") as f:
+        f.write("ok")
 
-    if submitted:
-        new_data = {
-            "产品型号版本": 产品型号版本,
-            "变流单元类型": 变流单元类型,
-            "变压器规格": 变压器规格,
-            "环网柜规格": 环网柜规格,
-            "SCC规格": SCC规格,
-            "售卖区域": 售卖区域,
-            "项目名称": 项目名称,
-            "手册料号": 手册料号,
-            "网址链接": 网址链接,
-            "创建时间": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-            "处理状态": "待审核",
-            "处理人": st.session_state["username"]
-        }
+if not os.path.exists(HISTORY_PATH):
+    save_df(pd.DataFrame(columns=ALL_FIELDS), HISTORY_PATH)
 
-        df = load_table("new_projects")
-        df = pd.concat([df, pd.DataFrame([new_data])], ignore_index=True)
-        save_table(df, "new_projects")
-        st.success("✅ 项目提交成功，等待管理员审核！")
+# ===================== 登录 =====================
+if 'login' not in st.session_state:
+    st.session_state.login = False
+    st.session_state.user = ''
+    st.session_state.role = ''
 
-# -------------------------- 页面功能：项目审核（管理员） --------------------------
-def show_audit_project():
-    if st.session_state["role"] != "管理员":
-        st.error("❌ 仅管理员可访问")
-        return
+user_df = load_df(USER_PATH)
+if 'admin' not in user_df['username'].values:
+    admin = pd.DataFrame([{'username':'admin','pwd':sha256('123456'),'role':'管理员'}])
+    save_df(admin, USER_PATH)
 
-    st.title("🔍 项目审核")
-    df = load_table("new_projects")
-
-    if df.empty:
-        st.info("暂无待审核项目")
-        return
-
-    st.dataframe(df, use_container_width=True)
-    select_id = st.number_input("输入要审核的项目ID", min_value=0, value=0)
-
-    col1, col2 = st.columns(2)
-    with col1:
-        if st.button("✅ 通过审核（移入历史库）"):
-            item = df[df["id"] == select_id]
-            if item.empty:
-                st.error("项目不存在")
-            else:
-                history_df = load_table("history_projects")
-                history_df = pd.concat([history_df, item], ignore_index=True)
-                save_table(history_df, "history_projects")
-                new_df = df[df["id"] != select_id]
-                save_table(new_df, "new_projects")
-                st.success("审核通过，已归档至历史库")
-                st.rerun()
-
-    with col2:
-        if st.button("❌ 驳回项目"):
-            df = df[df["id"] != select_id]
-            save_table(df, "new_projects")
-            st.success("已驳回该项目")
-            st.rerun()
-
-# -------------------------- 页面功能：历史项目库 --------------------------
-def show_history():
-    st.title("📚 历史项目库")
-    df = load_table("history_projects")
-    st.dataframe(df, use_container_width=True)
-
-# -------------------------- 页面功能：用户管理（管理员） --------------------------
-def show_user_admin():
-    if st.session_state["role"] != "管理员":
-        st.error("❌ 仅管理员可访问")
-        return
-
-    st.title("👥 用户管理")
-    users_df = load_table("users")
-    st.dataframe(users_df, use_container_width=True)
-
-    st.subheader("新增用户")
-    new_user = st.text_input("新账号")
-    new_pwd = st.text_input("新密码", type="password")
-    new_role = st.selectbox("权限", ["普通用户", "管理员"])
-
-    if st.button("添加用户"):
-        if add_user(new_user, new_pwd, new_role):
-            st.success("用户添加成功")
+def login():
+    st.markdown("## 🔐 登录系统")
+    u = st.text_input('账号')
+    p = st.text_input('密码', type='password')
+    if st.button('登录', use_container_width=True):
+        df = load_df(USER_PATH)
+        row = df[df['username'] == u]
+        if not row.empty and row.iloc[0]['pwd'] == sha256(p):
+            st.session_state.login = True
+            st.session_state.user = u
+            st.session_state.role = row.iloc[0]['role']
             st.rerun()
         else:
-            st.error("用户已存在")
+            st.error('账号或密码错误')
 
-# -------------------------- 页面功能：系统备份 --------------------------
-def show_backup():
-    if st.session_state["role"] != "管理员":
-        st.error("❌ 仅管理员可访问")
-        return
+if not st.session_state.login:
+    login()
+    st.stop()
 
-    st.title("💾 数据库备份")
-    if st.button("立即备份"):
-        file = backup_database()
-        st.success(f"备份完成：{file}")
+# ===================== 加载数据 =====================
+hist_df = load_df(HISTORY_PATH)
+new_df = load_df(NEW_PROJECT_PATH)
 
-# -------------------------- 主程序路由 --------------------------
-def main():
-    # 初始化数据库
-    init_database()
+# 下拉选项
+area_opts = get_options(hist_df, '售卖区域')
+model_opts = get_options(hist_df, '产品型号版本')
+converter_opts = get_options(hist_df, '变流单元类型')
+trans_opts = get_options(hist_df, '变压器规格')
+cab_opts = get_options(hist_df, '环网柜规格')
+scc_opts = get_options(hist_df, 'SCC规格')
 
-    # 会话状态初始化
-    if "login" not in st.session_state:
-        st.session_state["login"] = False
-        st.session_state["username"] = ""
-        st.session_state["role"] = ""
+# ===================== 主界面 =====================
+st.title('⚡ 储能项目手册料号申请及管理系统')
+st.info(f'当前用户：{st.session_state.user}｜角色：{st.session_state.role}')
+role = st.session_state.role
 
-    # 未登录 → 显示登录页
-    if not st.session_state["login"]:
-        show_login_page()
-        return
+# ———————— 美化菜单 + 新增【首页】 ————————
+menu = ['🏠 首页', '📥 提交新项目', '📚 历史项目库']
+if role == '普通用户':
+    menu += ['📄 我的提交']
+else:
+    menu += ['⚙️ 待审核项目', '📤 批量导入', '👥 用户管理']
 
-    # 已登录 → 显示侧边栏菜单
-    menu = [
-        "🏠 首页",
-        "📝 提交新项目",
-        "📚 历史项目库",
-        "🔍 项目审核（管理员）",
-        "👥 用户管理（管理员）",
-        "💾 系统备份（管理员）"
-    ]
-    choice = st.sidebar.radio("菜单", menu)
+page = st.sidebar.radio('**主菜单**', menu)
 
-    # 路由
-    if choice == "🏠 首页":
-        show_home()
-    elif choice == "📝 提交新项目":
-        show_submit_project()
-    elif choice == "📚 历史项目库":
-        show_history()
-    elif choice == "🔍 项目审核（管理员）":
-        show_audit_project()
-    elif choice == "👥 用户管理（管理员）":
-        show_user_admin()
-    elif choice == "💾 系统备份（管理员）":
-        show_backup()
+# ------------------------------
+# 🏠 欢迎首页（新增）
+# ------------------------------
+if page == '🏠 首页':
+    st.markdown(f"""
+    <div class="welcome-card">
+        <h1>欢迎回来，{st.session_state.user}！</h1>
+        <p>储能项目手册料号申请及管理系统</p>
+    </div>
+    """, unsafe_allow_html=True)
 
-    # 退出登录
-    if st.sidebar.button("🚪 退出登录"):
-        st.session_state["login"] = False
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        st.metric("历史项目总数", len(hist_df))
+    with col2:
+        st.metric("待审核项目", len(new_df[new_df['处理状态'] == '待审核']))
+    with col3:
+        st.metric("今日日期", datetime.now().strftime("%Y-%m-%d"))
+
+    st.markdown("### 系统功能指南")
+    st.info("""
+    - 📥 **提交新项目**：申请储能项目手册料号（下拉可选历史，也可直接输入新项目参数）
+    - 📚 **历史项目库**：查看、搜索、修改、删除历史项目
+    - ⚙️ **待审核项目**：管理员审核料号申请
+    - 📤 **批量导入**：批量导入项目数据
+    - 👥 **用户管理**：账号权限管理
+    """)
+
+# ------------------------------
+# 📥 提交新项目【已精简优化：单下拉组件支持选择+手动输入，删除右侧冗余输入框】
+# ------------------------------
+elif page == '📥 提交新项目':
+    st.header('📥 提交新项目配置')
+    with st.form('new_form'):
+        # 整行单列布局，取消左右双栏冗余自定义框，selectbox开启allow_manual_input可直接打字新增内容
+        售卖区域 = st.selectbox('售卖区域（可选历史/N/A，可直接输入新内容）', area_opts, index=0)
+        产品型号版本 = st.selectbox('产品型号版本（可选历史/N/A，可直接输入新内容）', model_opts, index=0)
+        变流单元类型 = st.selectbox('变流单元类型（可选历史/N/A，可直接输入新内容）', converter_opts, index=0)
+        变压器规格 = st.selectbox('变压器规格（可选历史/N/A，可直接输入新内容）', trans_opts, index=0)
+        环网柜规格 = st.selectbox('环网柜规格（可选历史/N/A，可直接输入新内容）', cab_opts, index=0)
+        SCC规格 = st.selectbox('SCC规格（可选历史/N/A，可直接输入新内容）', scc_opts, index=0)
+        项目名称 = st.text_input('项目名称（必填）').strip()
+
+        submitted = st.form_submit_button('✅ 提交新项目', use_container_width=True)
+        if submitted:
+            if not 项目名称:
+                st.error('项目名称不能为空')
+            else:
+                data = {
+                    '售卖区域': 售卖区域.strip(),
+                    '产品型号版本': 产品型号版本.strip(),
+                    '变流单元类型': 变流单元类型.strip(),
+                    '变压器规格': 变压器规格.strip(),
+                    '环网柜规格': 环网柜规格.strip(),
+                    'SCC规格': SCC规格.strip(),
+                    '项目名称': 项目名称,
+                    '手册料号': '',
+                    '网址链接': '',
+                    '创建时间': datetime.now().strftime('%Y-%m-%d %H:%M'),
+                    '处理状态': '待审核',
+                    '处理人': st.session_state.user
+                }
+                new_df = load_df(NEW_PROJECT_PATH)
+                new_df = pd.concat([new_df, pd.DataFrame([data])], ignore_index=True)
+                save_df(new_df, NEW_PROJECT_PATH)
+                st.success('提交成功，等待管理员审核')
+
+# ------------------------------
+# 📄 我的提交
+# ------------------------------
+elif page == '📄 我的提交' and role == '普通用户':
+    st.header('📄 我提交的项目')
+    df = load_df(NEW_PROJECT_PATH)
+    mine = df[df['处理人'] == st.session_state.user]
+    st.dataframe(mine, use_container_width=True)
+    if not mine.empty:
+        t = datetime.now().strftime("%Y%m%d%H%M")
+        st.download_button('📥 导出Excel', to_excel(mine), f'我的提交_{t}.xlsx', use_container_width=True)
+
+# ------------------------------
+# ⚙️ 待审核项目
+# ------------------------------
+elif page == '⚙️ 待审核项目' and role == '管理员':
+    st.header('⚙️ 待审核项目')
+    todo = new_df[new_df['处理状态'] == '待审核']
+    if todo.empty:
+        st.success('暂无待审核项目')
+        st.stop()
+
+    st.dataframe(todo, use_container_width=True)
+    t = datetime.now().strftime("%Y%m%d%H%M")
+    st.download_button('📥 导出待审核', to_excel(todo), f'待审核_{t}.xlsx', use_container_width=True)
+
+    idx = st.selectbox('选择项目', todo.index, format_func=lambda x: todo.loc[x,'项目名称'])
+    item = todo.loc[idx]
+
+    st.subheader('📌 项目信息')
+    st.dataframe(pd.DataFrame([item]), use_container_width=True)
+
+    st.subheader('🔍 最佳匹配')
+    matches = []
+    for _, h in hist_df.iterrows():
+        r = match_rate(item, h)
+        if r > 0:
+            matches.append((r, h))
+    matches.sort(reverse=True, key=lambda x:x[0])
+    if matches:
+        st.success(f'最佳匹配：{matches[0][0]}%')
+        st.dataframe(pd.DataFrame([matches[0][1]]), use_container_width=True)
+    else:
+        st.warning('无匹配项目')
+
+    col1, col2 = st.columns(2)
+    if col1.button('🔗 借用最佳匹配', type='primary', use_container_width=True):
+        if not matches:
+            st.error('无匹配项')
+        else:
+            item['手册料号'] = matches[0][1]['手册料号']
+            item['网址链接'] = matches[0][1]['网址链接']
+            item['处理状态'] = '已借用'
+            new_df2 = new_df.drop(idx)
+            hist_df2 = pd.concat([hist_df, pd.DataFrame([item])], ignore_index=True)
+            save_df(new_df2, NEW_PROJECT_PATH)
+            save_df(hist_df2, HISTORY_PATH)
+            st.success('已借用')
+            st.rerun()
+
+    if col2.button('✏️ 手动录入', type='secondary', use_container_width=True):
+        st.session_state['edit_idx'] = idx
         st.rerun()
 
-if __name__ == "__main__":
-    main()
+# 手动录入
+if 'edit_idx' in st.session_state and role == '管理员':
+    idx = st.session_state.edit_idx
+    new_df = load_df(NEW_PROJECT_PATH)
+    hist_df = load_df(HISTORY_PATH)
+    if idx in new_df.index:
+        st.header('✏️ 手动录入手册信息')
+        item = new_df.loc[idx]
+        pn = st.text_input('手册料号', item.get('手册料号', ''))
+        url = st.text_input('网址链接', item.get('网址链接', ''))
+        if st.button('保存并入库', use_container_width=True):
+            item['手册料号'] = pn.strip()
+            item['网址链接'] = url.strip()
+            item['处理状态'] = '已手动录入'
+            new_df2 = new_df.drop(idx)
+            hist_df2 = pd.concat([hist_df, pd.DataFrame([item])], ignore_index=True)
+            save_df(new_df2, NEW_PROJECT_PATH)
+            save_df(hist_df2, HISTORY_PATH)
+            del st.session_state['edit_idx']
+            st.success('保存成功')
+            st.rerun()
+
+# ------------------------------
+# 📤 批量导入
+# ------------------------------
+elif page == '📤 批量导入' and role == '管理员':
+    st.header('📤 批量导入项目到历史库')
+    uploaded = st.file_uploader('上传Excel/CSV', type=['xlsx','csv'])
+    if uploaded:
+        try:
+            if uploaded.name.endswith('.csv'):
+                df = pd.read_csv(uploaded, encoding='utf-8-sig').fillna("")
+            else:
+                df = pd.read_excel(uploaded).fillna("")
+
+            need_cols = ['售卖区域','项目名称','产品型号版本','变流单元类型','变压器规格','环网柜规格','SCC规格']
+            miss = [c for c in need_cols if c not in df.columns]
+            if miss:
+                st.error(f'缺少字段：{miss}')
+            else:
+                st.dataframe(df, use_container_width=True)
+                if st.button('✅ 确认导入历史库', use_container_width=True):
+                    df['创建时间'] = datetime.now().strftime('%Y-%m-%d %H:%M')
+                    df['处理状态'] = '已批量导入'
+                    df['处理人'] = st.session_state.user
+                    for c in ALL_FIELDS:
+                        if c not in df.columns:
+                            df[c] = ''
+                    df = df[ALL_FIELDS]
+                    new_hist = pd.concat([hist_df, df], ignore_index=True)
+                    save_df(new_hist, HISTORY_PATH)
+                    st.success(f'导入成功 {len(df)} 条')
+                    st.rerun()
+        except Exception as e:
+            st.error(f'导入失败：{str(e)}')
+
+# ------------------------------
+# 📚 历史项目库
+# ------------------------------
+elif page == '📚 历史项目库':
+    st.header('📚 历史项目库（搜索/筛选/修改/删除/导出）')
+    df = load_df(HISTORY_PATH)
+
+    kw = st.text_input('🔍 搜索：名称/型号/料号/变压器/SCC等全字段')
+    if kw:
+        df = df[df.apply(lambda r: kw.lower() in ' '.join(r.astype(str)).lower(), axis=1)]
+
+    with st.expander('高级筛选'):
+        c1,c2,c3 = st.columns(3)
+        areas = ['全部'] + [x for x in area_opts if x]
+        models = ['全部'] + [x for x in model_opts if x]
+        stats = ['全部'] + sorted([x for x in df['处理状态'].unique() if x])
+        area = c1.selectbox('售卖区域', areas)
+        model = c2.selectbox('产品型号', models)
+        stat = c3.selectbox('处理状态', stats)
+        if area != '全部':
+            df = df[df['售卖区域'] == area]
+        if model != '全部':
+            df = df[df['产品型号版本'] == model]
+        if stat != '全部':
+            df = df[df['处理状态'] == stat]
+
+    st.dataframe(df, use_container_width=True)
+    t = datetime.now().strftime("%Y%m%d%H%M")
+    if not df.empty:
+        st.download_button('📥 导出Excel', to_excel(df), f'历史项目库_{t}.xlsx', use_container_width=True)
+
+    if role == '管理员' and not df.empty:
+        st.subheader('🛠️ 项目修改/删除')
+        idx = st.selectbox('选择要操作的项目', df.index, format_func=lambda x: df.loc[x,'项目名称'])
+        item = df.loc[idx].copy()
+
+        with st.form('edit_form'):
+            c1, c2 = st.columns(2)
+            
+            item['售卖区域'] = c1.selectbox('售卖区域', area_opts, index=area_opts.index(item['售卖区域']) if item['售卖区域'] in area_opts else 0)
+            item['产品型号版本'] = c2.selectbox('产品型号版本', model_opts, index=model_opts.index(item['产品型号版本']) if item['产品型号版本'] in model_opts else 0)
+            item['变流单元类型'] = c1.selectbox('变流单元类型', converter_opts, index=converter_opts.index(item['变流单元类型']) if item['变流单元类型'] in converter_opts else 0)
+            item['变压器规格'] = c2.selectbox('变压器规格', trans_opts, index=trans_opts.index(item['变压器规格']) if item['变压器规格'] in trans_opts else 0)
+            item['环网柜规格'] = c1.selectbox('环网柜规格', cab_opts, index=cab_opts.index(item['环网柜规格']) if item['环网柜规格'] in cab_opts else 0)
+            item['SCC规格'] = c2.selectbox('SCC规格', scc_opts, index=scc_opts.index(item['SCC规格']) if item['SCC规格'] in scc_opts else 0)
+
+            item['项目名称'] = c1.text_input('项目名称', item['项目名称'])
+            item['手册料号'] = c2.text_input('手册料号', item['手册料号'])
+            item['网址链接'] = c1.text_input('网址链接', item['网址链接'])
+
+            current_status = item['处理状态']
+            if current_status not in STATUS_OPTIONS:
+                status_list = [current_status] + STATUS_OPTIONS
+            else:
+                status_list = STATUS_OPTIONS
+            
+            item['处理状态'] = c2.selectbox('处理状态', status_list, index=status_list.index(current_status))
+
+            save_edit = st.form_submit_button('💾 保存修改', use_container_width=True)
+
+        if save_edit:
+            df.loc[idx] = item
+            save_df(df, HISTORY_PATH)
+            st.success('修改成功！')
+            st.rerun()
+
+        if st.button('🗑️ 删除此项目', type='secondary', use_container_width=True):
+            df = df.drop(idx)
+            save_df(df, HISTORY_PATH)
+            st.warning('已删除')
+            st.rerun()
+
+        with st.expander('⚠️ 重置历史项目库（清空所有）'):
+            if st.button('确认清空历史库（不可恢复）', use_container_width=True):
+                save_df(pd.DataFrame(columns=ALL_FIELDS), HISTORY_PATH)
+                st.warning('已清空历史库')
+                st.rerun()
+
+# ------------------------------
+# 👥 用户管理
+# ------------------------------
+elif page == '👥 用户管理' and role == '管理员':
+    st.header('👥 用户管理')
+    df = load_df(USER_PATH)
+    st.dataframe(df, use_container_width=True)
+
+    st.subheader('新增用户')
+    u = st.text_input('账号')
+    p = st.text_input('密码')
+    r = st.selectbox('角色', ['普通用户','管理员'])
+    if st.button('添加用户', use_container_width=True):
+        if u and p:
+            new_row = {'username':u,'pwd':sha256(p),'role':r}
+            df = pd.concat([df, pd.DataFrame([new_row])], ignore_index=True)
+            save_df(df, USER_PATH)
+            st.success('添加成功')
+            st.rerun()
+        else:
+            st.error('账号密码不能为空')
